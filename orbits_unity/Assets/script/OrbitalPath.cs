@@ -73,7 +73,7 @@ public class OrbitalPath : MonoBehaviour {
 		UpdateDisplay();
 	}
 
-	void UpdateDisplay() {
+	public void UpdateDisplay() {
 		UpdateRotation();
 		UpdatePropertyBlock();
 	}
