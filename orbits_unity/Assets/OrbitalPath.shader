@@ -1,13 +1,19 @@
 ﻿Shader "Orbital Path" {
 	Properties {
-		_Color ("Color", Color) = (1, 1, 1, 1)
+		_Color ("Color", Color) = (1, 1, 1, 0.15)
 		_A ("Semimajor Axis", Float) = 100
 		[PowerSlider(3)] _E ("Eccentricity", Range(0, 1)) = 0
 	}
 	SubShader {
-		Tags { "RenderType" = "Opaque" }
+		Tags {
+			"RenderType" = "Transparent"
+			"RenderQueue" = "Transparent"
+			"IgnoreProjector" = "True"
+		}
 
 		Pass {
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
@@ -23,6 +29,8 @@
 
 			float _A;
 			float _E;
+
+			fixed4 _Color;
 
 			v2f vert(appdata_base v) {
 				v2f o;
@@ -45,7 +53,7 @@
 			}
 
 			fixed4 frag(v2f i) : SV_Target {
-				return fixed4(1, 1, 1, 1);
+				return _Color;
 			}
 			ENDCG
 		}
