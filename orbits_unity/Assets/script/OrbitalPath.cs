@@ -12,7 +12,8 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 	public Color color = new Color(1, 1, 1, 0.15f);
 
 	static Mesh _mesh;
-	public static Mesh mesh { get {
+	public static Mesh mesh {
+		get {
 			if (_mesh == null) {
 				Mesh mesh = new Mesh();
 				mesh.name = "orbital path mesh";
