@@ -9,12 +9,6 @@ public class Asterank : SingletonBehaviour<Asterank> {
 
 	public delegate void QueryCallback(int i, Data data);
 
-	void Awake() {
-		Query("{\"e\":{\"$lt\":0.1},\"i\":{\"$lt\":4},\"a\":{\"$lt\":1.5}}", 20, (i, data) => {
-			Debug.Log(string.Format("{0}: {1}", i, data.e));
-		});
-	}
-
 	public static void Query(string query, int limit, QueryCallback callback) {
  		instance.StartCoroutine(QueryRoutine(string.Format("{0}?query={1}&limit={2}", url, query, limit), callback));
 	}
@@ -41,10 +35,13 @@ public class Asterank : SingletonBehaviour<Asterank> {
 	[System.Serializable]
 	public class Data {
 
-		public string full_name;
-		public float i = 0;
-		public float a = 1;
-		public float e = 0;
+		public float est_diamater = 1;	// est. diameter (km ?)
+		public string full_name = "";	// name
+		public float i = 0;			// inclination (deg)
+		public float a = 1;			// semimajor axis (au)
+		public float e = 0;			// eccentricity
+		public float om = 0;			// longitude of the ascending node (deg)
+		public float w = 0;			// argument of periapsis (deg)
 
 	}
 
