@@ -27,9 +27,24 @@ public class Asterank : SingletonBehaviour<Asterank> {
 			string json = www.text;
 			int i = 0;
 			foreach (Match m in Regex.Matches(json, @"(\{[^\}]*\})")) {
-				Data data = JsonUtility.FromJson<Data>(m.ToString());
-				data.index = i;
-				dataCallback(data);
+				Data data = null;
+				try {
+					data = JsonUtility.FromJson<Data>(m.ToString());
+				} catch(System.ArgumentException e) {
+					Debug.LogErrorFormat("Error parsing JSON data {0}: {1}", i, e);
+				}
+				if (data != null) {
+					if (data.a <= 0) {
+						Debug.LogErrorFormat("Invalid JSON data {0}: Invalid Semimajor Axis of {1} AU", i, data.a);
+					}
+					else if (data.e < 0 || data.e >= 1) {
+						Debug.LogErrorFormat("Invalid JSON data {0}: Invalid Eccentricity of {1}", i, data.e);
+					}
+					else {
+						data.index = i;
+						dataCallback(data);
+					}
+				}
 				if (i % instance.callbacksPerFrame == 0) {
 					yield return null;
 				}

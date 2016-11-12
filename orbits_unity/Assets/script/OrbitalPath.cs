@@ -34,6 +34,7 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 		get {
 			if (_mat == null) {
 				_mat = new Material(Shader.Find("Orbital Path"));
+				_mat.color = new Color(0, 0, 0, 0);
 			}
 			return _mat;
 		}
