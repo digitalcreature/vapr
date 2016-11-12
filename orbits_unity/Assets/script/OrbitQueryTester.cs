@@ -7,7 +7,7 @@ public class OrbitQueryTester : SingletonBehaviour<OrbitQueryTester> {
 	public int limit = 1;
 
 	void Awake() {
-		Asterank.Query(query, limit, (data) => OrbitalPath.FromAsterankData(data));
+		Asterank.Query(query, limit, (data) => Asteroid.FromAsterankData(data));
 	}
 
 }

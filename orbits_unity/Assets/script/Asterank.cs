@@ -41,12 +41,12 @@ public class Asterank : SingletonBehaviour<Asterank> {
 		public int index = 0;
 
 		public float est_diamater = 1;	// est. diameter (km ?)
-		public string full_name = "";	// name
-		public float i = 0;			// inclination (deg)
-		public float a = 1;			// semimajor axis (au)
-		public float e = 0;			// eccentricity
-		public float om = 0;			// longitude of the ascending node (deg)
-		public float w = 0;			// argument of periapsis (deg)
+		public string full_name = "";		// name
+		public float i = 0;					// inclination (deg)
+		public float a = 1;					// semimajor axis (au)
+		public float e = 0;					// eccentricity
+		public float om = 0;					// longitude of the ascending node (deg)
+		public float w = 0;					// argument of periapsis (deg)
 
 	}
 

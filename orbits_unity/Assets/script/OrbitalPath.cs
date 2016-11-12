@@ -3,11 +3,7 @@ using System.Collections.Generic;
 
 public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 
-	public float semimajorAxis = 1;
-	public float eccentricity = 0;
-	public float inclination = 0;
-	public float periapsisArgument = 0;
-	public float nodeLongitude = 0;
+	public OrbitalElements elements;
 
 	public Color color = new Color(1, 1, 1, 0.15f);
 
@@ -87,14 +83,15 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 	}
 
 	public static OrbitalPath FromAsterankData(Asterank.Data data) {
-		OrbitalPath path = Allocate("orbital path [" + data.full_name + "]");
-		path.semimajorAxis = data.a;
-		path.eccentricity = data.e;
-		path.inclination = data.i;
-		path.periapsisArgument = data.w;
-		path.nodeLongitude = data.om;
+		OrbitalPath path = Allocate();
+		path.SetFromAsterankData(data);
 		path.UpdateDisplay();
 		return path;
+	}
+
+	public void SetFromAsterankData(Asterank.Data data) {
+		name = "orbital path [" + data.full_name + "]";
+		elements.SetFromAsterankData(data);
 	}
 
 	public void UpdateDisplay() {
@@ -104,16 +101,16 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 
 	void UpdateRotation() {
 		transform.rotation = Quaternion.identity;
-		transform.Rotate(0, -periapsisArgument, 0, Space.World);
-		transform.Rotate(0, 0, -inclination, Space.World);
-		transform.Rotate(0, -nodeLongitude, 0, Space.World);
+		transform.Rotate(0, -elements.periapsisArgument, 0, Space.World);
+		transform.Rotate(0, 0, -elements.inclination, Space.World);
+		transform.Rotate(0, -elements.nodeLongitude, 0, Space.World);
 	}
 
 	void UpdatePropertyBlock() {
 		if (render != null && block != null) {
 			// block.SetColor(colorPropertyID, color);
-			block.SetFloat(semimajorAxisPropertyID, semimajorAxis);
-			block.SetFloat(eccentricityPropertyID, eccentricity);
+			block.SetFloat(semimajorAxisPropertyID, elements.semimajorAxis);
+			block.SetFloat(eccentricityPropertyID, elements.eccentricity);
 			render.SetPropertyBlock(block);
 		}
 	}
@@ -122,5 +119,30 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 		UpdateDisplay();
 	}
 
+}
+
+[System.Serializable]
+public struct OrbitalElements {
+
+	public float semimajorAxis;
+	public float eccentricity;
+	public float inclination;
+	public float periapsisArgument;
+	public float nodeLongitude;
+	public float trueAnomaly;
+
+	public static OrbitalElements FromAsterankData(Asterank.Data data) {
+		OrbitalElements elements = new OrbitalElements();
+		elements.SetFromAsterankData(data);
+		return elements;
+	}
+
+	public void SetFromAsterankData(Asterank.Data data) {
+		semimajorAxis = data.a;
+		eccentricity = data.e;
+		inclination = data.i;
+		periapsisArgument = data.w;
+		nodeLongitude = data.om;
+	}
 
 }
