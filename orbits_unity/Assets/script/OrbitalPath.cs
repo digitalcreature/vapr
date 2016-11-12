@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class OrbitalPath : MonoBehaviour {
+public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 
 	public float semimajorAxis = 1;
 	public float eccentricity = 0;
@@ -14,7 +14,7 @@ public class OrbitalPath : MonoBehaviour {
 			if (_mesh == null) {
 				Mesh mesh = new Mesh();
 				mesh.name = "orbital path mesh";
-				int vcount = 64;
+				int vcount = 72;
 				Vector3[] verts = new Vector3[vcount];
 				int[] indices = new int[vcount + 1];
 				for (int v = 0; v < vcount; v ++) {
@@ -64,13 +64,24 @@ public class OrbitalPath : MonoBehaviour {
 	MeshRenderer render;
 	MaterialPropertyBlock block;
 
-	void Awake() {
+	protected override void OnAllocate() {
 		filter = gameObject.AddComponent<MeshFilter>();
 		filter.mesh = mesh;
 		render = gameObject.AddComponent<MeshRenderer>();
 		render.sharedMaterial = mat;
 		block = new MaterialPropertyBlock();
 		UpdateDisplay();
+	}
+
+	public static OrbitalPath FromAsterankData(Asterank.Data data) {
+		OrbitalPath path = Allocate("orbital path [" + data.full_name + "]");
+		path.semimajorAxis = data.a;
+		path.eccentricity = data.e;
+		path.inclination = data.i;
+		path.periapsisArgument = data.w;
+		path.nodeLongitude = data.om;
+		path.UpdateDisplay();
+		return path;
 	}
 
 	public void UpdateDisplay() {

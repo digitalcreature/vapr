@@ -5,12 +5,13 @@ using System.Text.RegularExpressions;
 
 public class Asterank : SingletonBehaviour<Asterank> {
 
-	public const string url = "http://asterank.com/api/asterank";
+	public const string baseurl = "http://asterank.com/api/asterank";
 
-	public delegate void QueryCallback(int i, Data data);
+	public delegate void QueryCallback(Data data);
 
 	public static void Query(string query, int limit, QueryCallback callback) {
- 		instance.StartCoroutine(QueryRoutine(string.Format("{0}?query={1}&limit={2}", url, query, limit), callback));
+		string url = string.Format("{0}?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
+ 		instance.StartCoroutine(QueryRoutine(url, callback));
 	}
 	public static void Query(string query, QueryCallback callback) {
 		Query(query, 1, callback);
@@ -23,7 +24,9 @@ public class Asterank : SingletonBehaviour<Asterank> {
 			string json = www.text;
 			int i = 0;
 			foreach (Match m in Regex.Matches(json, @"(\{[^\}]*\})")) {
-				callback(i, JsonUtility.FromJson<Data>(m.ToString()));
+				Data data = JsonUtility.FromJson<Data>(m.ToString());
+				data.index = i;
+				callback(data);
 				i ++;
 			}
 		}
@@ -34,6 +37,8 @@ public class Asterank : SingletonBehaviour<Asterank> {
 
 	[System.Serializable]
 	public class Data {
+
+		public int index = 0;
 
 		public float est_diamater = 1;	// est. diameter (km ?)
 		public string full_name = "";	// name
