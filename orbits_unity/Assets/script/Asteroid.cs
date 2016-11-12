@@ -7,9 +7,42 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 
 	public OrbitalPath path { get; private set; }
 
+
+	static Mesh _mesh;
+	public static Mesh mesh {
+		get {
+			if (_mesh == null) {
+				GameObject prim = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				_mesh = prim.GetComponent<MeshFilter>().sharedMesh;
+				Destroy(prim);
+			}
+			return _mesh;
+		}
+	}
+
+	static Material _mat;
+	public static Material mat {
+		get {
+			if (_mat == null) {
+				_mat = new Material(Shader.Find("Sprites/Default"));
+			}
+			return _mat;
+		}
+	}
+
+	MeshFilter filter;
+	MeshRenderer render;
+
 	protected override void OnAllocate() {
+		filter = GetComponent<MeshFilter>();
+		if (filter == null) filter = gameObject.AddComponent<MeshFilter>();
+		render = GetComponent<MeshRenderer>();
+		if (render == null) render = gameObject.AddComponent<MeshRenderer>();
+		filter.mesh = mesh;
+		render.material = mat;
 		path = OrbitalPath.Allocate(name);
 		transform.parent = path.transform;
+		transform.localScale = Vector3.one * 0.05f;
 	}
 
 	protected override void OnFree() {
@@ -20,6 +53,7 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 	public static Asteroid FromAsterankData(Asterank.Data data) {
 		Asteroid asteroid = Allocate("asteroid [" + data.full_name + "]");
 		asteroid.elements.SetFromAsterankData(data);
+		asteroid.elements.CalculateAnomalies();
 		asteroid.path.name = "orbit [" + data.full_name + "]";
 		asteroid.path.elements = asteroid.elements;
 		asteroid.path.UpdateDisplay();
@@ -33,6 +67,11 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 			path.elements = elements;
 			path.UpdateDisplay();
 		}
+	}
+
+	void Update() {
+		// elements.trueAnomaly = Time.time * elements.meanMotion * 90;
+		// UpdatePosition();
 	}
 
 	public void UpdatePosition() {

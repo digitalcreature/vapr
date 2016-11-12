@@ -27,6 +27,7 @@ public class Asterank : SingletonBehaviour<Asterank> {
 				Data data = JsonUtility.FromJson<Data>(m.ToString());
 				data.index = i;
 				callback(data);
+				yield return null;
 				i ++;
 			}
 		}
@@ -47,6 +48,9 @@ public class Asterank : SingletonBehaviour<Asterank> {
 		public float e = 0;					// eccentricity
 		public float om = 0;					// longitude of the ascending node (deg)
 		public float w = 0;					// argument of periapsis (deg)
+		public float n = 0;					// mean motion (deg/day)
+		public double tp = 0;				// time of periapsis passage (JED)
+		public float GM = 1;					// standard gravitational parameter (km^3/s^2)
 
 	}
 
