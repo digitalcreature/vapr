@@ -111,7 +111,7 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 
 	void UpdatePropertyBlock() {
 		if (render != null && block != null) {
-			block.SetColor(colorPropertyID, color);
+			// block.SetColor(colorPropertyID, color);
 			block.SetFloat(semimajorAxisPropertyID, semimajorAxis);
 			block.SetFloat(eccentricityPropertyID, eccentricity);
 			render.SetPropertyBlock(block);

@@ -1,6 +1,6 @@
 ﻿Shader "Orbital Path" {
 	Properties {
-		_Color ("Color", Color) = (1, 1, 1, 0.15)
+		_Color ("Color", Color) = (1, 1, 1, 0.1)
 		_A ("Semimajor Axis", Float) = 100
 		[PowerSlider(3)] _E ("Eccentricity", Range(0, 1)) = 0
 	}
