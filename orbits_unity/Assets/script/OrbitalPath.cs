@@ -9,12 +9,14 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 	public float periapsisArgument = 0;
 	public float nodeLongitude = 0;
 
+	public Color color = new Color(1, 1, 1, 0.15f);
+
 	static Mesh _mesh;
 	public static Mesh mesh { get {
 			if (_mesh == null) {
 				Mesh mesh = new Mesh();
 				mesh.name = "orbital path mesh";
-				int vcount = 72;
+				int vcount = 64;
 				Vector3[] verts = new Vector3[vcount];
 				int[] indices = new int[vcount + 1];
 				for (int v = 0; v < vcount; v ++) {
@@ -37,6 +39,16 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 				_mat = new Material(Shader.Find("Orbital Path"));
 			}
 			return _mat;
+		}
+	}
+
+	static int _color = -1;
+	public static int colorPropertyID {
+		get {
+			if (_color < 0) {
+				_color = Shader.PropertyToID("_Color");
+			}
+			return _color;
 		}
 	}
 
@@ -98,6 +110,7 @@ public class OrbitalPath : PooledBehaviour<OrbitalPath> {
 
 	void UpdatePropertyBlock() {
 		if (render != null && block != null) {
+			block.SetColor(colorPropertyID, color);
 			block.SetFloat(semimajorAxisPropertyID, semimajorAxis);
 			block.SetFloat(eccentricityPropertyID, eccentricity);
 			render.SetPropertyBlock(block);
