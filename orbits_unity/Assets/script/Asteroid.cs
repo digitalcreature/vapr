@@ -7,7 +7,6 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 
 	public OrbitalPath path { get; private set; }
 
-
 	static Mesh _mesh;
 	public static Mesh mesh {
 		get {
@@ -30,8 +29,11 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 		}
 	}
 
+	public float smoothedTrueAnomaly { get; private set; }
+
 	MeshFilter filter;
 	MeshRenderer render;
+
 
 	protected override void OnAllocate() {
 		filter = GetComponent<MeshFilter>();
@@ -70,15 +72,19 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 	}
 
 	void Update() {
-		// elements.trueAnomaly = Time.time * elements.meanMotion * 90;
-		// UpdatePosition();
+		smoothedTrueAnomaly = Mathf.LerpAngle(smoothedTrueAnomaly, elements.trueAnomaly, Time.deltaTime * 5);
+		UpdatePosition(smoothedTrueAnomaly);
 	}
 
-	public void UpdatePosition() {
+	public void Step() {
+		elements.CalculateAnomalies();
+	}
+
+	public void UpdatePosition(float trueAnomaly) {
 		float a = elements.semimajorAxis;
 		float e = elements.eccentricity;
-		float cos = Mathf.Cos(-elements.trueAnomaly * Mathf.Deg2Rad);
-		float sin = Mathf.Sin(-elements.trueAnomaly * Mathf.Deg2Rad);
+		float cos = Mathf.Cos(-trueAnomaly * Mathf.Deg2Rad);
+		float sin = Mathf.Sin(-trueAnomaly * Mathf.Deg2Rad);
 		float r =
 			(a * (1 - (e * e)))
 			/ (1 + (e * cos));
@@ -89,5 +95,6 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 		);
 		transform.localPosition = pos;
 	}
+	public void UpdatePosition() { UpdatePosition(elements.trueAnomaly); }
 
 }

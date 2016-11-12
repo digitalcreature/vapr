@@ -7,17 +7,20 @@ public class Asterank : SingletonBehaviour<Asterank> {
 
 	public const string baseurl = "http://asterank.com/api/asterank";
 
-	public delegate void QueryCallback(Data data);
+	public delegate void DataCallback(Data data);
+	public delegate void FinishCallback();
 
-	public static void Query(string query, int limit, QueryCallback callback) {
+	public int callbacksPerFrame = 25;
+
+	public static void Query(string query, int limit, DataCallback dataCallback, FinishCallback finishCallback) {
 		string url = string.Format("{0}?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
- 		instance.StartCoroutine(QueryRoutine(url, callback));
+ 		instance.StartCoroutine(QueryRoutine(url, dataCallback, finishCallback));
 	}
-	public static void Query(string query, QueryCallback callback) {
-		Query(query, 1, callback);
+	public static void Query(string query, DataCallback dataCallback, FinishCallback finishCallback) {
+		Query(query, 1, dataCallback, finishCallback);
 	}
 
-	static IEnumerator QueryRoutine(string url, QueryCallback callback) {
+	static IEnumerator QueryRoutine(string url, DataCallback dataCallback, FinishCallback finishCallback) {
 		WWW www = new WWW(url);
 		yield return www;
 		if (string.IsNullOrEmpty(www.error)) {
@@ -26,10 +29,13 @@ public class Asterank : SingletonBehaviour<Asterank> {
 			foreach (Match m in Regex.Matches(json, @"(\{[^\}]*\})")) {
 				Data data = JsonUtility.FromJson<Data>(m.ToString());
 				data.index = i;
-				callback(data);
-				yield return null;
+				dataCallback(data);
+				if (i % instance.callbacksPerFrame == 0) {
+					yield return null;
+				}
 				i ++;
 			}
+			finishCallback();
 		}
 		else {
 			Debug.LogError(www.error);

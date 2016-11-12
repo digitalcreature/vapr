@@ -137,6 +137,9 @@ public struct OrbitalElements {
 			}
 			return _epoch;
 		}
+		set {
+			_epoch = value;
+		}
 	}
 
 	public static double UpdateEpoch() {
@@ -192,7 +195,7 @@ public struct OrbitalElements {
 		return E;
 	}
 
-	public void CalculateAnomalies() {
+	public void CalculateAnomalies(double epoch) {
 		float dt = (float) (epoch - periapsisPassage);
 		meanAnomaly = dt * meanMotion;
 		eccentricAnomaly = CalculateEccentricAnomaly(
@@ -204,5 +207,6 @@ public struct OrbitalElements {
 		);
 		eccentricAnomaly *= Mathf.Rad2Deg;
 	}
+	public void CalculateAnomalies() { CalculateAnomalies(epoch); }
 
 }

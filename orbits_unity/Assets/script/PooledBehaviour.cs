@@ -3,28 +3,37 @@ using System.Collections.Generic;
 
 public abstract class PooledBehaviour<T> : MonoBehaviour where T : PooledBehaviour<T> {
 
-	static Stack<T> pool;
+	static Stack<T> inactive;
+	public static HashSet<T> active { get; private set; }
+
+	static void CheckPools() {
+		if (inactive == null) inactive = new Stack<T>();
+		if (active == null) active = new HashSet<T>();
+	}
+
 	public static T Allocate(string name = "[pooled object]") {
-		if (pool == null) pool = new Stack<T>();
+		CheckPools();
 		T obj;
-		if (pool.Count == 0) {
+		if (inactive.Count == 0) {
 			obj = new GameObject(name).AddComponent<T>();
 		}
 		else {
-			obj = pool.Pop();
+			obj = inactive.Pop();
 			obj.name = name;
 		}
+		active.Add(obj);
 		obj.gameObject.SetActive(true);
 		obj.OnAllocate();
 		return obj;
 	}
 
 	public static void Free(T obj) {
-		if (pool == null) pool = new Stack<T>();
+		CheckPools();
 		if (obj != null) {
 			obj.OnFree();
 			obj.gameObject.SetActive(false);
-			pool.Push(obj);
+			inactive.Push(obj);
+			active.Remove(obj);
 		}
 	}
 
