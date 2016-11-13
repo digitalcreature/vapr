@@ -8,6 +8,21 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 	public Color color = Color.white;
 	public float alpha = 0.025f;
 
+	static bool _visiblePaths = true;
+	public static bool visiblePaths {
+		get {
+			return _visiblePaths;
+		}
+		set {
+			if (value != _visiblePaths) {
+				_visiblePaths = value;
+				foreach (OrbitalPlane plane in OrbitalPlane.active) {
+					plane.render.enabled = value;
+				}
+			}
+		}
+	}
+
 	static Mesh _mesh;
 	public static Mesh mesh {
 		get {

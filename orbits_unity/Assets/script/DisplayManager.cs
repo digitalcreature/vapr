@@ -8,4 +8,10 @@ public class DisplayManager : SingletonBehaviour<DisplayManager> {
 	public float predefinedBodiesPlaneAlpha = 0.5f;
 
 
+	void Update() {
+		if (Input.GetKeyDown("p")) {
+			OrbitalPlane.visiblePaths = !OrbitalPlane.visiblePaths;
+		}
+	}
+
 }
