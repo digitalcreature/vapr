@@ -1,11 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Asteroid : PooledBehaviour<Asteroid> {
+public class Body : PooledBehaviour<Body> {
 
-	public OrbitalElements elements;
+	public Orbit orbit;
 
-	public OrbitalPath path { get; private set; }
+	public OrbitalPlane path { get; private set; }
 
 	static Mesh _mesh;
 	public static Mesh mesh {
@@ -42,47 +42,47 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 		if (render == null) render = gameObject.AddComponent<MeshRenderer>();
 		filter.mesh = mesh;
 		render.material = mat;
-		path = OrbitalPath.Allocate(name);
+		path = OrbitalPlane.Allocate(name);
 		transform.parent = path.transform;
-		transform.localScale = Vector3.one * 0.05f;
+		transform.localScale = Vector3.one * 0.025f;
 	}
 
 	protected override void OnFree() {
 		transform.parent = null;
-		OrbitalPath.Free(path);
+		OrbitalPlane.Free(path);
 	}
 
-	public static Asteroid FromAsterankData(Asterank.Data data) {
-		Asteroid asteroid = Allocate("asteroid [" + data.full_name + "]");
-		asteroid.elements.SetFromAsterankData(data);
-		asteroid.elements.CalculateAnomalies();
-		asteroid.path.name = "orbit [" + data.full_name + "]";
-		asteroid.path.elements = asteroid.elements;
-		asteroid.path.UpdateDisplay();
-		asteroid.UpdatePosition();
-		return asteroid;
+	public static Body FromAsterankData(AsterankUtil.Data data) {
+		Body body = Allocate("body [" + data.full_name + "]");
+		body.orbit.SetFromAsterankData(data);
+		body.orbit.CalculateAnomalies();
+		body.path.name = "orbit [" + data.full_name + "]";
+		body.path.orbit = body.orbit;
+		body.path.UpdateDisplay();
+		body.UpdatePosition();
+		return body;
 	}
 
 	void OnValidate() {
 		if (path != null) {
 			UpdatePosition();
-			path.elements = elements;
+			path.orbit = orbit;
 			path.UpdateDisplay();
 		}
 	}
 
 	void Update() {
-		smoothedTrueAnomaly = Mathf.LerpAngle(smoothedTrueAnomaly, elements.trueAnomaly, Time.deltaTime * 5);
+		smoothedTrueAnomaly = Mathf.LerpAngle(smoothedTrueAnomaly, orbit.trueAnomaly, Time.deltaTime * 5);
 		UpdatePosition(smoothedTrueAnomaly);
 	}
 
 	public void Step() {
-		elements.CalculateAnomalies();
+		orbit.CalculateAnomalies();
 	}
 
 	public void UpdatePosition(float trueAnomaly) {
-		float a = elements.semimajorAxis;
-		float e = elements.eccentricity;
+		float a = orbit.semimajorAxis;
+		float e = orbit.eccentricity;
 		float cos = Mathf.Cos(-trueAnomaly * Mathf.Deg2Rad);
 		float sin = Mathf.Sin(-trueAnomaly * Mathf.Deg2Rad);
 		float r =
@@ -95,6 +95,6 @@ public class Asteroid : PooledBehaviour<Asteroid> {
 		);
 		transform.localPosition = pos;
 	}
-	public void UpdatePosition() { UpdatePosition(elements.trueAnomaly); }
+	public void UpdatePosition() { UpdatePosition(orbit.trueAnomaly); }
 
 }

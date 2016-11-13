@@ -3,24 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-public class Asterank : SingletonBehaviour<Asterank> {
+public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 
 	public const string baseurl = "http://asterank.com/api/asterank";
 
 	public delegate void DataCallback(Data data);
 	public delegate void FinishCallback();
 
-	public int callbacksPerFrame = 25;
-
-	public static void Query(string query, int limit, DataCallback dataCallback, FinishCallback finishCallback) {
+	public static void Query(string query, int limit, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
 		string url = string.Format("{0}?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
- 		instance.StartCoroutine(QueryRoutine(url, dataCallback, finishCallback));
-	}
-	public static void Query(string query, DataCallback dataCallback, FinishCallback finishCallback) {
-		Query(query, 1, dataCallback, finishCallback);
+ 		instance.StartCoroutine(QueryRoutine(url, callbacksPerFrame, dataCallback, finishCallback));
 	}
 
-	static IEnumerator QueryRoutine(string url, DataCallback dataCallback, FinishCallback finishCallback) {
+	static IEnumerator QueryRoutine(string url, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
 		WWW www = new WWW(url);
 		yield return www;
 		if (string.IsNullOrEmpty(www.error)) {
@@ -45,7 +40,7 @@ public class Asterank : SingletonBehaviour<Asterank> {
 						dataCallback(data);
 					}
 				}
-				if (i % instance.callbacksPerFrame == 0) {
+				if (i % callbacksPerFrame == 0) {
 					yield return null;
 				}
 				i ++;
