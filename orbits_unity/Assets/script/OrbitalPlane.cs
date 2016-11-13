@@ -45,14 +45,14 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 		}
 	}
 
-	static Material _mat;
-	public static Material mat {
+	static Material _material;
+	public static Material material {
 		get {
-			if (_mat == null) {
-				_mat = new Material(Shader.Find("Orbital Path"));
-				_mat.SetFloat("_Alpha", 0.25f);
+			if (_material == null) {
+				_material = new Material(Shader.Find("Orbital Path"));
+				_material.SetFloat("_Alpha", 0.25f);
 			}
-			return _mat;
+			return _material;
 		}
 	}
 
@@ -106,7 +106,7 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 		render = GetComponent<MeshRenderer>();
 		if (render == null) render = gameObject.AddComponent<MeshRenderer>();
 		filter.mesh = mesh;
-		render.sharedMaterial = mat;
+		render.sharedMaterial = material;
 		block = new MaterialPropertyBlock();
 		UpdateDisplay();
 	}

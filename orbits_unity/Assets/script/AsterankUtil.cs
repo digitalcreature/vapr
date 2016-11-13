@@ -10,12 +10,15 @@ public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 	public delegate void DataCallback(Data data);
 	public delegate void FinishCallback();
 
+	public static bool busy { get; private set; }
+
 	public static void Query(string query, int limit, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
 		string url = string.Format("{0}?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
  		instance.StartCoroutine(QueryRoutine(url, callbacksPerFrame, dataCallback, finishCallback));
 	}
 
 	static IEnumerator QueryRoutine(string url, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
+		busy = true;
 		WWW www = new WWW(url);
 		yield return www;
 		if (string.IsNullOrEmpty(www.error)) {
@@ -50,6 +53,7 @@ public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 		else {
 			Debug.LogError(www.error);
 		}
+		busy = false;
 	}
 
 	[System.Serializable]

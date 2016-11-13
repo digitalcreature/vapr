@@ -9,8 +9,12 @@ public class DisplayManager : SingletonBehaviour<DisplayManager> {
 
 
 	void Update() {
+		SystemManager sys = SystemManager.instance;
 		if (Input.GetKeyDown("p")) {
 			OrbitalPlane.visiblePaths = !OrbitalPlane.visiblePaths;
+		}
+		if (Input.GetKeyDown("space")) {
+			sys.timeScale = sys.timeScale == 0 ? 1 : 0;
 		}
 	}
 
