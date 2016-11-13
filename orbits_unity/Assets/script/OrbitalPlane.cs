@@ -5,14 +5,15 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 
 	public Orbit orbit;
 
-	public Color color = new Color(1, 1, 1, 0.15f);
+	public Color color = Color.white;
+	public float alpha = 0.025f;
 
 	static Mesh _mesh;
 	public static Mesh mesh {
 		get {
 			if (_mesh == null) {
 				Mesh mesh = new Mesh();
-				mesh.name = "orbital path mesh";
+				mesh.name = "orbital plane mesh";
 				int vcount = 64;
 				Vector3[] verts = new Vector3[vcount];
 				int[] indices = new int[vcount + 1];
@@ -34,7 +35,7 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 		get {
 			if (_mat == null) {
 				_mat = new Material(Shader.Find("Orbital Path"));
-				_mat.color = new Color(0, 0, 0, 0);
+				_mat.SetFloat("_Alpha", 0.25f);
 			}
 			return _mat;
 		}
@@ -47,6 +48,16 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 				_color = Shader.PropertyToID("_Color");
 			}
 			return _color;
+		}
+	}
+
+	static int _alpha = -1;
+	public static int alphaPropertyID {
+		get {
+			if (_alpha < 0) {
+				_alpha = Shader.PropertyToID("_Alpha");
+			}
+			return _alpha;
 		}
 	}
 
@@ -86,14 +97,14 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 	}
 
 	public static OrbitalPlane FromAsterankData(AsterankUtil.Data data) {
-		OrbitalPlane path = Allocate();
-		path.SetFromAsterankData(data);
-		path.UpdateDisplay();
-		return path;
+		OrbitalPlane plane = Allocate();
+		plane.SetFromAsterankData(data);
+		plane.UpdateDisplay();
+		return plane;
 	}
 
 	public void SetFromAsterankData(AsterankUtil.Data data) {
-		name = "orbital path [" + data.full_name + "]";
+		name = "orbital plane [" + data.full_name + "]";
 		orbit.SetFromAsterankData(data);
 	}
 
@@ -111,7 +122,10 @@ public class OrbitalPlane : PooledBehaviour<OrbitalPlane> {
 
 	void UpdatePropertyBlock() {
 		if (render != null && block != null) {
-			// block.SetColor(colorPropertyID, color);
+			if (color != Color.white) {
+				block.SetColor(colorPropertyID, color);
+			}
+			block.SetFloat(alphaPropertyID, alpha);
 			block.SetFloat(semimajorAxisPropertyID, orbit.semimajorAxis);
 			block.SetFloat(eccentricityPropertyID, orbit.eccentricity);
 			render.SetPropertyBlock(block);

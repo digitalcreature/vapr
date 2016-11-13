@@ -1,6 +1,7 @@
 ﻿Shader "Orbital Path" {
 	Properties {
-		_Color ("Color", Color) = (1, 1, 1, 0.1)
+		_Color ("Color", Color) = (1, 1, 1, 1)
+		_Alpha ("Alpha", Range(0, 1)) = 0.1
 		_A ("Semimajor Axis", Float) = 100
 		[PowerSlider(3)] _E ("Eccentricity", Range(0, 1)) = 0
 	}
@@ -31,6 +32,7 @@
 			float _E;
 
 			fixed4 _Color;
+			fixed _Alpha;
 
 			v2f vert(appdata_base v) {
 				v2f o;
@@ -53,7 +55,7 @@
 			}
 
 			fixed4 frag(v2f i) : SV_Target {
-				return _Color;
+				return fixed4(_Color.xyz, _Alpha);
 			}
 			ENDCG
 		}

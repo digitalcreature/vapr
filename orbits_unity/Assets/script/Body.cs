@@ -4,8 +4,10 @@ using System.Collections.Generic;
 public class Body : PooledBehaviour<Body> {
 
 	public Orbit orbit;
+	public float radius = 0.1f;
+	public Color color = Color.white;
 
-	public OrbitalPlane path { get; private set; }
+	public OrbitalPlane plane { get; private set; }
 
 	static Mesh _mesh;
 	public static Mesh mesh {
@@ -34,7 +36,6 @@ public class Body : PooledBehaviour<Body> {
 	MeshFilter filter;
 	MeshRenderer render;
 
-
 	protected override void OnAllocate() {
 		filter = GetComponent<MeshFilter>();
 		if (filter == null) filter = gameObject.AddComponent<MeshFilter>();
@@ -42,32 +43,57 @@ public class Body : PooledBehaviour<Body> {
 		if (render == null) render = gameObject.AddComponent<MeshRenderer>();
 		filter.mesh = mesh;
 		render.material = mat;
-		path = OrbitalPlane.Allocate(name);
-		transform.parent = path.transform;
-		transform.localScale = Vector3.one * 0.025f;
+		plane = OrbitalPlane.Allocate(name);
+		transform.parent = plane.transform;
+		UpdateDisplay();
+	}
+
+	public void UpdateDisplay() {
+		transform.localScale = Vector3.one * radius;
+		MaterialPropertyBlock block = new MaterialPropertyBlock();
+		if (color != Color.white) {
+			block.SetColor(OrbitalPlane.colorPropertyID, color);
+		}
+		render.SetPropertyBlock(block);
+		plane.color = color;
+		plane.UpdateDisplay();
 	}
 
 	protected override void OnFree() {
 		transform.parent = null;
-		OrbitalPlane.Free(path);
+		OrbitalPlane.Free(plane);
 	}
 
 	public static Body FromAsterankData(AsterankUtil.Data data) {
 		Body body = Allocate("body [" + data.full_name + "]");
 		body.orbit.SetFromAsterankData(data);
 		body.orbit.CalculateAnomalies();
-		body.path.name = "orbit [" + data.full_name + "]";
-		body.path.orbit = body.orbit;
-		body.path.UpdateDisplay();
+		body.plane.name = "orbit [" + data.full_name + "]";
+		body.plane.orbit = body.orbit;
+		body.plane.UpdateDisplay();
 		body.UpdatePosition();
 		return body;
 	}
 
+	public static Body FromBodyInfo(Body.Info info) {
+		Body body = Allocate("body [" + info.name + "]");
+		body.orbit = info.orbit;
+		body.orbit.CalculateAnomalies();
+		body.color = info.color;
+		body.radius = info.radius;
+		body.plane.name = "orbit [" + info.name + "]";
+		body.plane.orbit = body.orbit;
+		body.plane.UpdateDisplay();
+		body.UpdatePosition();
+		body.UpdateDisplay();
+		return body;
+	}
+
 	void OnValidate() {
-		if (path != null) {
+		if (plane != null) {
 			UpdatePosition();
-			path.orbit = orbit;
-			path.UpdateDisplay();
+			plane.orbit = orbit;
+			plane.UpdateDisplay();
 		}
 	}
 
@@ -96,5 +122,13 @@ public class Body : PooledBehaviour<Body> {
 		transform.localPosition = pos;
 	}
 	public void UpdatePosition() { UpdatePosition(orbit.trueAnomaly); }
+
+	[System.Serializable]
+	public class Info {
+		public string name;
+		public Color color;
+		public float radius;
+		public Orbit orbit;
+	}
 
 }
