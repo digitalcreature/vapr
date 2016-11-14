@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 
-	public const string baseurl = "http://asterank.com/api/asterank";
+	public const string baseurl = "https://crossorigin.me/http://asterank.com/api/asterank";
 
 	public delegate void DataCallback(Data data);
 	public delegate void FinishCallback();

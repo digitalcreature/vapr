@@ -1,13 +1,33 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en-us">
 	<head>
 		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>VAPR</title>
+		<link rel="stylesheet" href="data/style.css" media="screen">
+		<!-- <link rel="shortcut icon" href="data/favicon.ico" /> -->
+		<!-- <script src="data/UnityProgress.js"></script> -->
 	</head>
-	<body>
-		<h1>VAPR</h1>
-		<p>
-			Visualizing Asteroids is Pretty Rad
-		</p>
+	<body class="template">
+		<div class="template-wrap clear">
+			<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+			<!-- <br> -->
+			<!-- <div class="logo"></div> -->
+			<!-- <div class="fullscreen"><img src="data/fullscreen.png" width="38" height="38" alt="Fullscreen" title="Fullscreen" onclick="SetFullscreen(1);" /></div> -->
+			<!-- <div class="title">vapr</div> -->
+		</div>
+		<script type='text/javascript'>
+			var Module = {
+				TOTAL_MEMORY: 268435456,
+				errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+				compatibilitycheck: null,
+				// doNotCaptureKeyboard: true,
+				dataUrl: "release/vapr.data",
+				codeUrl: "release/vapr.js",
+				asmUrl: "release/vapr.asm.js",
+				memUrl: "release/vapr.mem",
+			};
+		</script>
+		<script src="release/UnityLoader.js"></script>
 	</body>
 </html>
