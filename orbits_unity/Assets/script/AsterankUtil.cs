@@ -5,7 +5,8 @@ using System.Text.RegularExpressions;
 
 public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 
-	public const string baseurl = "https://crossorigin.me/http://asterank.com/api/asterank";
+	public const string corsProxyUrl = "https://crossorigin.me/";
+	public const string baseurl = "http://asterank.com/api/asterank";
 
 	public delegate void DataCallback(Data data);
 	public delegate void FinishCallback();
@@ -13,7 +14,10 @@ public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 	public static bool busy { get; private set; }
 
 	public static void Query(string query, int limit, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
-		string url = string.Format("{0}?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
+		string queryString = string.Format("?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
+		// queryString = WWW.EscapeURL(queryString); // escape query for crossorigin.me
+		string url = string.Concat(baseurl, queryString);
+		Debug.Log(url);
  		instance.StartCoroutine(QueryRoutine(url, callbacksPerFrame, dataCallback, finishCallback));
 	}
 
