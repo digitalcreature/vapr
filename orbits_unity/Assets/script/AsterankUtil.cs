@@ -1,12 +1,13 @@
 using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 
-	public const string corsProxyUrl = "https://crossorigin.me/";
-	public const string baseurl = "http://asterank.com/api/asterank";
+	// public const string corsProxyUrl = "https://cors-anywhere.herokuapp.com/";
+	public const string baseurl = "asterank.com/api/asterank";
 
 	public delegate void DataCallback(Data data);
 	public delegate void FinishCallback();
@@ -14,19 +15,19 @@ public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 	public static bool busy { get; private set; }
 
 	public static void Query(string query, int limit, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
-		string queryString = string.Format("?query={1}&limit={2}", baseurl, WWW.EscapeURL(query), limit);
-		// queryString = WWW.EscapeURL(queryString); // escape query for crossorigin.me
-		string url = string.Concat(baseurl, queryString);
+		string queryString = string.Format("?query={1}&limit={2}", baseurl, UnityWebRequest.EscapeURL(query), limit);
+		// queryString = UnityWebRequest.EscapeURL(queryString); // escape query for crossorigin.me
+		string url = baseurl + queryString;
 		Debug.Log(url);
  		instance.StartCoroutine(QueryRoutine(url, callbacksPerFrame, dataCallback, finishCallback));
 	}
 
 	static IEnumerator QueryRoutine(string url, int callbacksPerFrame, DataCallback dataCallback, FinishCallback finishCallback) {
 		busy = true;
-		WWW www = new WWW(url);
-		yield return www;
-		if (string.IsNullOrEmpty(www.error)) {
-			string json = www.text;
+		var request = UnityWebRequest.Get(url);
+		yield return request.SendWebRequest();
+		if (!request.isNetworkError) {
+			string json = request.downloadHandler.text;
 			int i = 0;
 			foreach (Match m in Regex.Matches(json, @"(\{[^\}]*\})")) {
 				Data data = null;
@@ -55,7 +56,7 @@ public class AsterankUtil : SingletonBehaviour<AsterankUtil> {
 			finishCallback();
 		}
 		else {
-			Debug.LogError(www.error);
+			Debug.LogError(request.error);
 		}
 		busy = false;
 	}
